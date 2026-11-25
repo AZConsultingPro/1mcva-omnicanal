@@ -1,0 +1,1 @@
+window.ressourcesAtelier = {"form": "https://docs.google.com/forms/d/e/1FAIpQLSfxDDvXF1EHwt4SL8AvMFtoCNStWWM1-sDSfVlwOd0uly1r4A/viewform?usp=publish-editor", "capture": "instagram.jpg", "social": "https://www.instagram.com/p/C4G9DY1P2v2/"};
