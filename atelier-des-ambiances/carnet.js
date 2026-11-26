@@ -43,7 +43,7 @@ const carnet = (() => {
     if(number===2)return groupFields('Mes réponses · L’ambiance',[1,2].map(i=>
       '<div class="sensFields">'+field(k,'indice'+i,'Indice '+i+' · ce que je vois ou entends')+field(k,'facteur'+i,'Facteur d’ambiance')+field(k,'effet'+i,'Effet possible sur le client')+'</div>').join(''));
     return groupFields('Mes réponses · L’assortiment',field(k,'familles','Nommez deux familles de produits.')+field(k,'variantes','Donnez deux variantes du même modèle.')+field(k,'comparaison','Comparez deux références par une caractéristique.'))+
-      groupFields('Mon plan du rayon',field(k,'produit','Quel produit voulez-vous faire découvrir ?')+
+      groupFields('Mon plan de l’espace de vente',field(k,'produit','Quel produit voulez-vous faire découvrir ?')+
       '<p>Imaginez le plan vu de dessus. L’entrée se trouve en bas. Cliquez sur une zone pour y placer votre produit.</p><div class="planGrid">'+[3,4,5,0,1,2].map(i=>'<button type="button" data-zone="'+i+'" data-shop="'+k+'" aria-pressed="'+(answers[k].zone===areas[i])+'">'+areas[i]+'</button>').join('')+'</div><div class="planEntrance">↑ Entrée du client</div>'+
       field(k,'trajet','Décrivez le trajet depuis l’entrée jusqu’au produit.')+field(k,'amenagement1','Choix d’ambiance 1 et effet attendu')+field(k,'amenagement2','Choix d’ambiance 2 et effet attendu'));
   }
@@ -132,6 +132,7 @@ const carnet = (() => {
   function alertUser(msg){
     const note=node('carnetNotice');note.textContent=msg;note.hidden=false;
     const inline=node('sessionNotice');if(inline)inline.textContent=msg;
+    if(node('welcomeDialog').open)node('welcomeNotice').textContent=msg;
   }
   function openSession(newSession=false){
     const box=node('sessionDialog');startingNew=newSession;
@@ -174,7 +175,7 @@ const carnet = (() => {
   function finishImport(){
     if(!pending)return;
     const imported=pending;pending=null;
-    [node('confirmImport'),node('sessionDialog')].forEach(d=>{if(d.open)d.close()});
+    [node('confirmImport'),node('sessionDialog'),node('welcomeDialog')].forEach(d=>{if(d.open)d.close()});
     apply(imported);go(state.i);
     alertUser('Carnet repris · '+display()+' · Étape '+(state.i+1)+' sur 13.');
   }
@@ -203,6 +204,8 @@ const carnet = (() => {
   function onClick(e){
     const b=e.target.closest('button');if(!b)return;
     const d=b.dataset;
+    if(b.id==='welcomeOpen')return openWelcome();
+    if(b.id==='welcomeContinue'){node('welcomeDialog').close();if(!session)openSession();return;}
     if(b.id==='sessionButton')return openSession();
     if(d.mode)return modeForm(d.mode);
     if(d.selectshop!==undefined){shop=Number(d.selectshop);state.store=shop;render();return;}
@@ -219,6 +222,13 @@ const carnet = (() => {
       case 'new':openSession(true);break;
       case 'project':begin({mode:'projection',groupe:'',membres:[]});break;
     }
+  }
+  function openWelcome(){
+    node('welcomeImage').src=asset('zara.jpg');
+    node('welcomePdf').href=asset('fiche-accueil-eleve.pdf');
+    node('welcomeContinue').textContent=session?'Reprendre la séance':'Commencer la séance';
+    node('welcomeNotice').textContent='';
+    if(!node('welcomeDialog').open)node('welcomeDialog').showModal();
   }
   function start(){
     try{
@@ -240,7 +250,8 @@ const carnet = (() => {
       e.preventDefault();if(!node('saveHelp').open)node('saveHelp').showModal();
     });
     node('sessionDialog').addEventListener('cancel',e=>{if(!session)e.preventDefault()});
-    ready=true;if(!session)openSession();
+    node('welcomeDialog').addEventListener('cancel',e=>{if(!session)e.preventDefault()});
+    ready=true;openWelcome();
   }
   return {start,paint,persist,stageEnd,missionFields,teamPage,shopPage,missionNav,
     isLearner:learner,activeStore:()=>learner()?shop:-1,setShop:n=>{shop=n}};
