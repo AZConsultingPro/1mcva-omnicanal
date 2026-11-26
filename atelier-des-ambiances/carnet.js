@@ -225,7 +225,7 @@ const carnet = (() => {
   }
   function openWelcome(){
     node('welcomeImage').src=asset('zara.jpg');
-    node('welcomePdf').href=asset('fiche-accueil-eleve.pdf');
+    node('welcomePdf').href=asset('Dossier_impression_1MCVA.pdf');
     node('welcomeContinue').textContent=session?'Reprendre la séance':'Commencer la séance';
     node('welcomeNotice').textContent='';
     if(!node('welcomeDialog').open)node('welcomeDialog').showModal();
